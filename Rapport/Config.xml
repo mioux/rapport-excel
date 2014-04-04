@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<config>
+  <!-- Base de données -->
+  <dbserver>YOUR_DB_SERVER</dbserver>
+  <dblogin></dblogin>
+  <dbpw></dbpw>
+  <dbtrusted>True</dbtrusted>
+  <dbdb>DEFAULT_DATABASE</dbdb>
+
+  <!-- Rapport -->
+  <excelsheet>False</excelsheet>
+  <excelsqlfile>rapport_test.sql</excelsqlfile>
+  <excelfileprefix>Rapport_</excelfileprefix>
+  <excellogprefix>Log_</excellogprefix>
+  <excelsheetprefix>Sheet_</excelsheetprefix>
+  
+  <!-- Mail -->
+  <mailsend>False</mailsend>
+  <mailsmtp>MAIL_SERVER</mailsmtp>
+  <mailsmtpport>25</mailsmtpport>
+  <mailmustlogin>False</mailmustlogin>
+  <maillogin></maillogin>
+  <mailpw></mailpw>
+  <mailsubject>Test</mailsubject>
+  <mailbody><![CDATA[Hello,
+  
+Here is your daily file.
+
+Best regards.]]></mailbody>
+  <mailsender>example@example.com</mailsender>
+  <mailrecipient>example@example.com</mailrecipient>
+</config>
+
+
