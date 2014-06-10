@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,6 +45,9 @@ namespace Rapport
         private static string maillogin = string.Empty;
         private static string mailPw = string.Empty;
 
+        // Paramètre de format de date
+        private static string dateTimeFormat = string.Empty;
+
         // Tags des paramètres de la base de données
         private const string serverTag = "dbserver";
         private const string loginTag = "dblogin";
@@ -70,6 +73,9 @@ namespace Rapport
         private const string mustloginTag = "mailmustlogin";
         private const string mailloginTag = "maillogin";
         private const string mailpw = "mailpw";
+
+        // Tag du paramètre de format de date
+        private const string dateTimeFormatTag = "dateTimeFormat";
 
         // Paramètres de connexion à la base de données
         private const string conStringTpl = "Data Source = {0}; Initial Catalog = {1}; {2}";
@@ -178,6 +184,10 @@ namespace Rapport
             if (errors.Length > 0)
                 errorClose(errors.ToString());
 
+            dateTimeFormat = GetXmlValue(xml, dateTimeFormatTag);
+            if (dateTimeFormat == string.Empty)
+                dateTimeFormat = "dd/mm/yyyy";
+
             // Extraction des données
 
             string conStringLogin = true == DBTrustedConnection ? trustedConnectionTpl : string.Format(loginConStringTpl, DBLogin, DBPw);
@@ -209,6 +219,10 @@ namespace Rapport
             headerStyle.Alignment.Horizontal = StyleHorizontalAlignment.Center;
             headerStyle.Interior.Color = "#DEDEDE";
             headerStyle.Interior.Pattern = StyleInteriorPattern.Solid;
+
+
+            WorksheetStyle dateStyle = rapport.Styles.Add("dateStyle");
+            dateStyle.NumberFormat = dateTimeFormat;
 
             string ExcelFileName = string.Format("{1}{0:yyyy_MM_dd}.xml", DateTime.Now, outFilePrefix);
 
@@ -246,7 +260,7 @@ namespace Rapport
                             if (curRawData is bool)
                                 curData = Convert.ToBoolean(curRawData) ? "1" : "0";
                             else if (curRawData is DateTime)
-                                curData = Convert.ToDateTime(curRawData).ToString("dd/MM/yyyy HH:mm:ss");
+                                curData = Convert.ToDateTime(curRawData).ToString("s");
 
                             WorksheetCell curCell = row.Cells.Add(curData);
                             if (curRawData is int ||
@@ -259,6 +273,11 @@ namespace Rapport
                                 curCell.Data.Type = DataType.Number;
                             else if (curRawData is bool)
                                 curCell.Data.Type = DataType.Boolean;
+                            else if (curRawData is DateTime)
+                            {
+                                curCell.Data.Type = DataType.DateTime;
+                                curCell.StyleID = "dateStyle";
+                            }
                         }
                     }
 
@@ -387,5 +406,3 @@ namespace Rapport
         }
     }
 }
-
-
