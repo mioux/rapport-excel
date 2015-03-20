@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -283,6 +283,8 @@ namespace Rapport
 
                     if (false == bySheetOutput)
                         rapportSheet.Table.Rows.Add();
+                    else
+                    	rapportSheet.AutoFilter.Range = "R1C1:R1C" + curTable.Columns.Count;
                 }
 
                 rapport.Save(ExcelFileName);
