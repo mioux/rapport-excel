@@ -50,9 +50,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ToFile\Excel.cs" />
+    <Compile Include="Settings\DbSettings.cs" />
     <Compile Include="OutToFile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\FormatSettings.cs" />
+    <Compile Include="Settings\MailSettings.cs" />
+    <Compile Include="Settings\RapportSettings.cs" />
+    <Compile Include="Sql\MsSqlServer.cs" />
+    <Compile Include="Tags\DbTags.cs" />
+    <Compile Include="Tags\FormatTags.cs" />
+    <Compile Include="Tags\MailTags.cs" />
+    <Compile Include="Tags\RapportTags.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config.xml">

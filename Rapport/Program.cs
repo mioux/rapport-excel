@@ -1,87 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
 using System.Xml;
-using System.Data.SqlClient;
 using System.Data;
-using CarlosAg.ExcelXmlWriter;
-using System.Web;
 using System.Net.Mail;
 using System.Net;
+using Rapport.Settings;
+using Rapport.Tags;
+using Rapport.Sql;
+using Rapport.ToFile;
 
 namespace Rapport
 {
     class Program
     {
         // Fichier de config
-        private const string configFile = "Config.xml";
+        private static string configFile = "Config.xml";
 
-        // Paramètres du rapport
-        private static string rapportFile = "rapport.sql";
-        private static string outFilePrefix = "Rapport_";
-        private static string logFilePrefix = string.Empty;
-        private static string logFile = string.Empty;
-        private static string sheetNamePrefix = "Feuille";
-        private static bool bySheetOutput = false;
-
-        // Paramètres de la base de données
-        private static string DBAddress = string.Empty;
-        private static string DBLogin = string.Empty;
-        private static string DBPw = string.Empty;
-        private static string DBDefaultDb = string.Empty;
-        private static bool DBTrustedConnection = false;
-
-        // Paramètres du mail
-        private static bool doSendMail = false;
-        private static string mailServer = string.Empty;
-        private static string mailSubject = string.Empty;
-        private static string mailBody = string.Empty;
-        private static string mailSender = string.Empty;
-        private static string mailRecipient = string.Empty;
-        private static int mailPort = 25;
-        private static bool mailMustLogin = false;
-        private static string maillogin = string.Empty;
-        private static string mailPw = string.Empty;
-
-        // Paramètre de format de date
-        private static string dateTimeFormat = string.Empty;
-
-        // Tags des paramètres de la base de données
-        private const string serverTag = "dbserver";
-        private const string loginTag = "dblogin";
-        private const string pwTag = "dbpw";
-        private const string trustedTag = "dbtrusted";
-        private const string dbTag = "dbdb";
-
-        // Tags des paramètres du rapport
-        private const string sheetTag = "excelsheet";
-        private const string sqlfileTag = "excelsqlfile";
-        private const string fileprefixTag = "excelfileprefix";
-        private const string logprefixTag = "excellogprefix";
-        private const string sheetprefixTag = "excelsheetprefix";
-
-        // Tags des paramètres du mail
-        private const string mailTag = "mailsend";
-        private const string smtpTag = "mailsmtp";
-        private const string subjectTag = "mailsubject";
-        private const string bodyTag = "mailbody";
-        private const string senderTag = "mailsender";
-        private const string recipientTag = "mailrecipient";
-        private const string smtpportTag = "mailsmtpport";
-        private const string mustloginTag = "mailmustlogin";
-        private const string mailloginTag = "maillogin";
-        private const string mailpw = "mailpw";
-
-        // Tag du paramètre de format de date
-        private const string dateTimeFormatTag = "dateTimeFormat";
-
-        // Paramètres de connexion à la base de données
-        private const string conStringTpl = "Data Source = {0}; Initial Catalog = {1}; {2}";
-        private const string loginConStringTpl = "User Id = {0}; Password = {1};";
-        private const string trustedConnectionTpl = "Integrated Security=SSPI;";
-
+        public static OutToFile Redirect { get { return redirect; } }
         private static OutToFile redirect = null;
 
         /// <summary>
@@ -91,6 +27,10 @@ namespace Rapport
 
         static void Main(string[] args)
         {
+            bool tmpBool;
+            int tmpInt;
+            string tmpString;
+
             // L'appli est passée en culture en-US pour la gestion correcte des ToString dans le fichier Excel
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
@@ -101,21 +41,22 @@ namespace Rapport
             xml.Load(configFile);
 
             // Lecture des paramètres du rapport
-            if (false == Boolean.TryParse(GetXmlValue(xml, sheetTag), out bySheetOutput))
-                bySheetOutput = false;
-            rapportFile = GetXmlValue(xml, sqlfileTag);
-            outFilePrefix = GetXmlValue(xml, outFilePrefix);
-            sheetNamePrefix = GetXmlValue(xml, sheetprefixTag);
-            outFilePrefix = GetXmlValue(xml, fileprefixTag);
-            logFilePrefix = GetXmlValue(xml, logprefixTag);
+            if (false == Boolean.TryParse(GetSettingsValue(xml, RapportTags.Sheet), out tmpBool))
+                tmpBool = false;
+            RapportSettings.BySheetOutput = tmpBool;
+            RapportSettings.File = GetSettingsValue(xml, RapportTags.SqlFile);
+            RapportSettings.OutFilePrefix = GetSettingsValue(xml, RapportSettings.OutFilePrefix);
+            RapportSettings.SheetNamePrefix = GetSettingsValue(xml, RapportTags.SheetPrefix);
+            RapportSettings.OutFilePrefix = GetSettingsValue(xml, RapportTags.FilePrefix);
+            RapportSettings.LogFilePrefix = GetSettingsValue(xml, RapportTags.LogPrefix);
 
-            if (string.Empty != logFilePrefix.Trim())
+            if (string.Empty != RapportSettings.LogFilePrefix.Trim())
             {
-                logFile = string.Format("{0}{1:yyyy_MM_dd}.log", logFilePrefix, DateTime.Now);
-                redirect = new OutToFile(logFile);
+                RapportSettings.LogFile = string.Format("{0}{1:yyyy_MM_dd}.log", RapportSettings.LogFilePrefix, DateTime.Now);
+                redirect = new OutToFile(RapportSettings.LogFile);
             }
 
-            if (false == File.Exists(rapportFile))
+            if (false == File.Exists(RapportSettings.File))
                 //errorClose("Le fichier SQL du rapport est manquant");
                 errors.AppendLine("Le fichier SQL du rapport est manquant");
 
@@ -124,181 +65,78 @@ namespace Rapport
                 errors.AppendLine("Le fichier de configuration est manquant");
 
             // Lecture des paramètres de la base de données.
-            DBAddress = GetXmlValue(xml, serverTag);
-            DBLogin = GetXmlValue(xml, loginTag);
-            DBPw = GetXmlValue(xml, pwTag);
-            if (false == Boolean.TryParse(GetXmlValue(xml, trustedTag), out DBTrustedConnection))
-                DBTrustedConnection = false;
-            DBDefaultDb = GetXmlValue(xml, dbTag);
+            DbSettings.Address = GetSettingsValue(xml, DbTags.Server);
+            DbSettings.Login = GetSettingsValue(xml, DbTags.Login);
+            DbSettings.Pw = GetSettingsValue(xml, DbTags.Pw);
+            if (false == Boolean.TryParse(GetSettingsValue(xml, DbTags.Trusted), out tmpBool))
+                tmpBool = false;
+            DbSettings.TrustedConnection = tmpBool;
+            DbSettings.Default = GetSettingsValue(xml, DbTags.DefaultDb);
 
-            if (string.Empty == DBAddress.Trim())
+            if (string.Empty == DbSettings.Address.Trim())
                 //errorClose("Pas de serveur défini dans le fichier de config");
                 errors.AppendLine("Pas de serveur défini dans le fichier de config");
 
-            if (false == DBTrustedConnection && string.Empty == DBLogin.Trim())
+            if (false == DbSettings.TrustedConnection && string.Empty == DbSettings.Login.Trim())
                 //errorClose("Il doit y avoir un login OU autoriser la connexion windows (Trusted)");
                 errors.AppendLine("Il doit y avoir un login OU autoriser la connexion windows (Trusted)");
 
-            if (false == DBTrustedConnection && string.Empty == DBPw.Trim())
+            if (false == DbSettings.TrustedConnection && string.Empty == DbSettings.Pw.Trim())
                 Console.WriteLine(@"/!\ Pas de mot de passe défini pour le login /!\");
 
-            if (string.Empty == DBDefaultDb.Trim())
+            if (string.Empty == DbSettings.Default.Trim())
                 Console.WriteLine(@"/!\ Pas de base par défaut définie /!\");
 
             // Lecture des paramètres du mail
-            if (false == Boolean.TryParse(GetXmlValue(xml, mailTag), out doSendMail))
-                doSendMail = false;
-            if (true == doSendMail)
+            if (false == Boolean.TryParse(GetSettingsValue(xml, MailTags.Send), out tmpBool))
+                tmpBool = false;
+            MailSettings.Send = tmpBool;
+            if (true == MailSettings.Send)
             {
-                mailServer = GetXmlValue(xml, smtpTag);
-                if (false == int.TryParse(GetXmlValue(xml, smtpportTag), out mailPort))
-                    mailPort = 25;
-                if (false == bool.TryParse(GetXmlValue(xml, mustloginTag), out mailMustLogin))
-                    mailMustLogin = false;
-                if (true == mailMustLogin)
+                MailSettings.Server = GetSettingsValue(xml, MailTags.Smtp);
+                if (false == int.TryParse(GetSettingsValue(xml, MailTags.Port), out tmpInt))
+                    tmpInt = 25;
+                MailSettings.Port = tmpInt;
+                if (false == bool.TryParse(GetSettingsValue(xml, MailTags.MustLogin), out tmpBool))
+                    tmpBool = false;
+                MailSettings.MustLogin = tmpBool;
+                if (true == MailSettings.MustLogin)
                 {
-                    maillogin = GetXmlValue(xml, mailloginTag);
-                    mailPw = GetXmlValue(xml, mailpw);
+                    MailSettings.Login = GetSettingsValue(xml, MailTags.Login);
+                    MailSettings.Pw = GetSettingsValue(xml, MailTags.Pw);
                 }
-                mailSubject = GetXmlValue(xml, subjectTag);
-                mailBody = GetXmlValue(xml, bodyTag);
-                mailSender = GetXmlValue(xml, senderTag);
-                mailRecipient = GetXmlValue(xml, recipientTag);
+                MailSettings.Subject = GetSettingsValue(xml, MailTags.Subject);
+                MailSettings.Body = GetSettingsValue(xml, MailTags.Body);
+                MailSettings.Sender = GetSettingsValue(xml, MailTags.Sender);
+                MailSettings.Recipient = GetSettingsValue(xml, MailTags.recipientTag);
             }
 
-            if (true == doSendMail && string.Empty == mailServer.Trim())
+            if (true == MailSettings.Send && string.Empty == MailSettings.Server.Trim())
                 //errorClose("Aucun serveur mail défini alors que l'envoi de mail est actif");
                 errors.AppendLine("Aucun serveur mail défini alors que l'envoi de mail est actif");
-            if (true == doSendMail && string.Empty == mailSender.Trim())
+            if (true == MailSettings.Send && string.Empty == MailSettings.Sender.Trim())
                 //errorClose("Aucune adresse mail d'envoi définie alors que l'envoi de mail est actif");
                 errors.AppendLine("Aucune adresse mail d'envoi définie alors que l'envoi de mail est actif");
-            if (true == doSendMail && string.Empty == mailRecipient.Trim())
+            if (true == MailSettings.Send && string.Empty == MailSettings.Recipient.Trim())
                 //errorClose("Aucune adresse mail de destination définie alors que l'envoi de mail est actif");
                 errors.AppendLine("Aucune adresse mail de destination définie alors que l'envoi de mail est actif");
-            if (true == mailMustLogin && string.Empty == maillogin.Trim())
+            if (true == MailSettings.MustLogin && string.Empty == MailSettings.Login.Trim())
                 //errorClose("Le serveur de mail est configuré pour demander un login, mais aucun login fourni");
                 errors.AppendLine("Le serveur de mail est configuré pour demander un login, mais aucun login fourni");
-            if (true == mailMustLogin && string.Empty == mailPw.Trim())
+            if (true == MailSettings.MustLogin && string.Empty == MailSettings.Pw.Trim())
                 Console.WriteLine(@"/!\ Pas de mot de passe défini pour le serveur mail /!\");
 
             if (errors.Length > 0)
-                errorClose(errors.ToString());
+                ErrorClose(errors.ToString());
 
-            dateTimeFormat = GetXmlValue(xml, dateTimeFormatTag);
-            if (dateTimeFormat == string.Empty)
-                dateTimeFormat = "dd/mm/yyyy";
+            tmpString = GetSettingsValue(xml, FormatTags.DateTimeFormat);
+            if (tmpString != string.Empty)
+                FormatSettings.DateTime = tmpString;
 
             // Extraction des données
+            DataSet data = MsSqlServer.Extract();
 
-            string conStringLogin = true == DBTrustedConnection ? trustedConnectionTpl : string.Format(loginConStringTpl, DBLogin, DBPw);
-            string conString = string.Format(conStringTpl, DBAddress, DBDefaultDb, conStringLogin);
-
-            SqlConnection connection = new SqlConnection(conString);
-            try
-            {
-                connection.Open();
-            }
-            catch (Exception exp)
-            {
-                errorClose(string.Format("Erreur de connexion à la base de données : {0}", exp.Message));
-            }
-
-            string SQL = File.ReadAllText(rapportFile);
-
-            SqlCommand command = new SqlCommand(SQL, connection);
-            command.CommandTimeout = 1000000000;
-            DataSet data = new DataSet();
-
-            Workbook rapport = new Workbook();
-            Worksheet rapportSheet = null;
-
-            int tbCount = 0;
-
-            WorksheetStyle headerStyle = rapport.Styles.Add("HeaderStyle");
-            headerStyle.Font.Bold = true;
-            headerStyle.Alignment.Horizontal = StyleHorizontalAlignment.Center;
-            headerStyle.Interior.Color = "#DEDEDE";
-            headerStyle.Interior.Pattern = StyleInteriorPattern.Solid;
-
-
-            WorksheetStyle dateStyle = rapport.Styles.Add("dateStyle");
-            dateStyle.NumberFormat = dateTimeFormat;
-
-            string ExcelFileName = string.Format("{1}{0:yyyy_MM_dd}.xml", DateTime.Now, outFilePrefix);
-
-            try
-            {
-                SqlDataAdapter adapter = new SqlDataAdapter(command);
-                adapter.Fill(data);
-
-                foreach (DataTable curTable in data.Tables)
-                {
-                    if (null == rapportSheet && false == bySheetOutput)
-                        rapportSheet = rapport.Worksheets.Add(string.Format("{1}{0:dd-MM-yyyy}", DateTime.Now, sheetNamePrefix));
-                    else if (true == bySheetOutput)
-                        rapportSheet = rapport.Worksheets.Add(string.Format("{1}{0}", ++tbCount, sheetNamePrefix));
-
-                    WorksheetRow headerRow = rapportSheet.Table.Rows.Add();
-
-                    foreach (DataColumn curColumn in curTable.Columns)
-                    {
-                        WorksheetCell curCell = headerRow.Cells.Add(curColumn.ColumnName);
-                        curCell.StyleID = "HeaderStyle";
-                    }
-
-                    foreach (DataRow curRow in curTable.Rows)
-                    {
-                        WorksheetRow row = rapportSheet.Table.Rows.Add();
-                        foreach (DataColumn curColumn in curTable.Columns)
-                        {
-                            object curRawData = curRow[curColumn];
-
-                            string curData = string.Empty;
-                            if (curRawData != null && curRawData != DBNull.Value)
-                                curData = curRawData.ToString();
-
-                            if (curRawData is bool)
-                                curData = Convert.ToBoolean(curRawData) ? "1" : "0";
-                            else if (curRawData is DateTime)
-                                curData = Convert.ToDateTime(curRawData).ToString("s");
-
-                            WorksheetCell curCell = row.Cells.Add(curData);
-                            if (curRawData is int ||
-                                curRawData is short ||
-                                curRawData is byte ||
-                                curRawData is long ||
-                                curRawData is float ||
-                                curRawData is double ||
-                                curRawData is decimal)
-                                curCell.Data.Type = DataType.Number;
-                            else if (curRawData is bool)
-                                curCell.Data.Type = DataType.Boolean;
-                            else if (curRawData is DateTime)
-                            {
-                                curCell.Data.Type = DataType.DateTime;
-                                curCell.StyleID = "dateStyle";
-                            }
-                        }
-                    }
-
-                    if (false == bySheetOutput)
-                        rapportSheet.Table.Rows.Add();
-                    else
-                    	rapportSheet.AutoFilter.Range = "R1C1:R1C" + curTable.Columns.Count;
-                }
-
-                rapport.Save(ExcelFileName);
-            }
-            catch (Exception exp)
-            {
-                errorClose(string.Format("Erreur lors de l'exécution du rapport : {0}", exp.Message));
-            }
-            finally
-            {
-                connection.Close();
-                if (redirect != null)
-                    redirect.Dispose();
-            }
+            string ExcelFileName = Excel.Generate(data);
 
             try
             {
@@ -306,7 +144,7 @@ namespace Rapport
             }
             catch (Exception exp)
             {
-                errorClose(string.Format("Erreur lors de l'envoi du mail : {0}", exp.Message));
+                ErrorClose(string.Format("Erreur lors de l'envoi du mail : {0}", exp.Message));
             }
             finally
             {
@@ -329,20 +167,20 @@ namespace Rapport
             FileInfo fi = new FileInfo(fileName);
 
             // Envoi du mail
-            if (true == doSendMail && fi.Length > 0)
+            if (true == MailSettings.Send && fi.Length > 0)
             {
                 MailMessage mailMessage = new MailMessage();
-                mailMessage.From = new MailAddress(mailSender);
-                mailMessage.To.Add(mailRecipient);
-                mailMessage.Subject = mailSubject;
-                mailMessage.Body = mailBody;
+                mailMessage.From = new MailAddress(MailSettings.Sender);
+                mailMessage.To.Add(MailSettings.Recipient);
+                mailMessage.Subject = MailSettings.Subject;
+                mailMessage.Body = MailSettings.Body;
                 mailMessage.IsBodyHtml = false;
                 mailMessage.Attachments.Add(new Attachment(fileName));
 
-                SmtpClient smtp = new SmtpClient(mailServer, mailPort);
-                if (true == mailMustLogin)
+                SmtpClient smtp = new SmtpClient(MailSettings.Server, MailSettings.Port);
+                if (true == MailSettings.MustLogin)
                 {
-                    NetworkCredential smtpAuth = new NetworkCredential(maillogin, mailPw);
+                    NetworkCredential smtpAuth = new NetworkCredential(MailSettings.Login, MailSettings.Pw);
                     smtp.UseDefaultCredentials = false;
                     smtp.Credentials = smtpAuth;
                 }
@@ -357,14 +195,30 @@ namespace Rapport
         /// <param name="serverTag">Tag à retourner</param>
         /// <returns>InnerText du premier tag rencontré ou vide sinon</returns>
 
-        private static string GetXmlValue(XmlDocument xml, string tag)
+        private static string GetSettingsValue(XmlDocument xml, string tag)
         {
             string data = string.Empty;
 
-            XmlNodeList nodeBuff = xml.GetElementsByTagName(tag);
-            nodeBuff = xml.GetElementsByTagName(tag);
-            if (0 < nodeBuff.Count)
-                data = nodeBuff[0].InnerText;
+            bool found = false;
+
+            string[] args = Environment.GetCommandLineArgs();
+            foreach (string arg in args)
+            {
+                string cmdLineArg = string.Format("--{0}=", tag); 
+                if (arg.StartsWith(cmdLineArg))
+                {
+                    data = arg.Substring(cmdLineArg.Length);
+                    found = true;
+                }
+            }
+
+            if (false == found)
+            {
+                XmlNodeList nodeBuff = xml.GetElementsByTagName(tag);
+                nodeBuff = xml.GetElementsByTagName(tag);
+                if (0 < nodeBuff.Count)
+                    data = nodeBuff[0].InnerText;
+            }
 
             return data;
         }
@@ -376,7 +230,7 @@ namespace Rapport
 
         private static void argError(string arg)
         {
-            errorClose(string.Format("L'argument doit être numérique : {0}", arg));
+            ErrorClose(string.Format("L'argument doit être numérique : {0}", arg));
         }
 
         /// <summary>
@@ -384,19 +238,19 @@ namespace Rapport
         /// </summary>
         /// <param name="msg"></param>
 
-        private static void errorClose(string msg)
+        public static void ErrorClose(string msg)
         {
             Console.Error.WriteLine(msg);
 #if DEBUG
             Console.WriteLine("Erreur");
             Console.ReadKey(true);
 #endif
-            if (File.Exists(logFile) && redirect != null)
+            if (File.Exists(RapportSettings.LogFile) && redirect != null)
             {
                 try
                 {
                     redirect.Dispose();
-                    sendMail(logFile);
+                    sendMail(RapportSettings.LogFile);
                 }
                 catch (Exception exp)
                 {
