@@ -57,11 +57,9 @@ namespace Rapport
             }
 
             if (false == File.Exists(RapportSettings.File))
-                //errorClose("Le fichier SQL du rapport est manquant");
                 errors.AppendLine("Le fichier SQL du rapport est manquant");
 
             if (false == File.Exists(configFile))
-                //errorClose("Le fichier de configuration est manquant");
                 errors.AppendLine("Le fichier de configuration est manquant");
 
             // Lecture des paramètres de la base de données.
@@ -74,11 +72,9 @@ namespace Rapport
             DbSettings.Default = GetSettingsValue(xml, DbTags.DefaultDb);
 
             if (string.Empty == DbSettings.Address.Trim())
-                //errorClose("Pas de serveur défini dans le fichier de config");
                 errors.AppendLine("Pas de serveur défini dans le fichier de config");
 
             if (false == DbSettings.TrustedConnection && string.Empty == DbSettings.Login.Trim())
-                //errorClose("Il doit y avoir un login OU autoriser la connexion windows (Trusted)");
                 errors.AppendLine("Il doit y avoir un login OU autoriser la connexion windows (Trusted)");
 
             if (false == DbSettings.TrustedConnection && string.Empty == DbSettings.Pw.Trim())
@@ -112,16 +108,12 @@ namespace Rapport
             }
 
             if (true == MailSettings.Send && string.Empty == MailSettings.Server.Trim())
-                //errorClose("Aucun serveur mail défini alors que l'envoi de mail est actif");
                 errors.AppendLine("Aucun serveur mail défini alors que l'envoi de mail est actif");
             if (true == MailSettings.Send && string.Empty == MailSettings.Sender.Trim())
-                //errorClose("Aucune adresse mail d'envoi définie alors que l'envoi de mail est actif");
                 errors.AppendLine("Aucune adresse mail d'envoi définie alors que l'envoi de mail est actif");
             if (true == MailSettings.Send && string.Empty == MailSettings.Recipient.Trim())
-                //errorClose("Aucune adresse mail de destination définie alors que l'envoi de mail est actif");
                 errors.AppendLine("Aucune adresse mail de destination définie alors que l'envoi de mail est actif");
             if (true == MailSettings.MustLogin && string.Empty == MailSettings.Login.Trim())
-                //errorClose("Le serveur de mail est configuré pour demander un login, mais aucun login fourni");
                 errors.AppendLine("Le serveur de mail est configuré pour demander un login, mais aucun login fourni");
             if (true == MailSettings.MustLogin && string.Empty == MailSettings.Pw.Trim())
                 Console.WriteLine(@"/!\ Pas de mot de passe défini pour le serveur mail /!\");
