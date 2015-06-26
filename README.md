@@ -1,22 +1,22 @@
 # Qu'est ce que c'est ?
 
-Ceci est un programme qui génère des fichiers Excel à partir d'un fichier SQL. Seul SQL Server est géré. Il peut même être envoyé par mail à un destinataire. Si votre requête remonte plus d'une grille de résultats, tous seront extraits.
+Ceci est un programme qui gÃ©nÃ¨re des fichiers Excel Ã  partir d'un fichier SQL. Seul SQL Server est gÃ©rÃ©. Il peut mÃªme Ãªtre envoyÃ© par mail Ã  un destinataire. Si votre requÃªte remonte plus d'une grille de rÃ©sultats, tous seront extraits.
 
-# Comment ça marche ?
+# Comment Ã§a marche ?
 
-C'est simple, il y a un fichier de configuration `Config.xml` qui contient les informations nécessaires à la création du fichier. Les paramètres sont également accessible via la ligne de commande `--param=valeur` pour pouvoir scripter par exemple l'extraction sur plusieurs bases de données.
+C'est simple, il y a un fichier de configuration `Config.xml` qui contient les informations nÃ©cessaires Ã  la crÃ©ation du fichier. Les paramÃ¨tres sont Ã©galement accessible via la ligne de commande `--param=valeur` pour pouvoir scripter par exemple l'extraction sur plusieurs bases de donnÃ©es.
 
 # Pourquoi ?
 
-L'idée de base était de générer un fichier Excel journalier pour suivre le statut d'un programme. Tous les jours, je devais régénérer le fichier, et l'envoyer à une personne. Bon en fait, une fois le programme développé (sur mes temps de pause et de repos), je me suis rendu compte que l'envoi de mail n'était pas possible, car la machine qui générait les rapports n'avait pas d'accès en SMTP. Du coup, j'ai une fonction que j'ai développé, sans jamais l'avoir testée en production. Je l'ai testé en développement en revanche.
+L'idÃ©e de base Ã©tait de gÃ©nÃ©rer un fichier Excel journalier pour suivre le statut d'un programme. Tous les jours, je devais rÃ©gÃ©nÃ©rer le fichier, et l'envoyer Ã  une personne. Bon en fait, une fois le programme dÃ©veloppÃ© (sur mes temps de pause et de repos), je me suis rendu compte que l'envoi de mail n'Ã©tait pas possible, car la machine qui gÃ©nÃ©rait les rapports n'avait pas d'accÃ¨s en SMTP. Du coup, j'ai une fonction que j'ai dÃ©veloppÃ©, sans jamais l'avoir testÃ©e en production. Je l'ai testÃ© en dÃ©veloppement en revanche.
 
-Pourquoi CarlogAG ExcelXmlWriter et pas les outils office pour générer un vrai fichier Excel ? Tout simplement pour avoir un minimum de dépendances, et surtout, pas de Office installé sur la machine cible. Pratique pour un serveur.
+Pourquoi CarlogAG ExcelXmlWriter et pas les outils office pour gÃ©nÃ©rer un vrai fichier Excel ? Tout simplement pour avoir un minimum de dÃ©pendances, et surtout, pas de Office installÃ© sur la machine cible. Pratique pour un serveur.
 
 # Comment ?
 
-C'est à vous de voir... Une fois que vous avez paramétré le programme via le fichier `Config.xml` et/ou que vous ayez défini tous les paramètres, il suffit de lancer le programme pour que le fichier Excel soit généré, et potentiellement envoyé par mail à la/aux personne(s) concernée(s).
+C'est Ã  vous de voir... Une fois que vous avez paramÃ©trÃ© le programme via le fichier `Config.xml` et/ou que vous ayez dÃ©fini tous les paramÃ¨tres, il suffit de lancer le programme pour que le fichier Excel soit gÃ©nÃ©rÃ©, et potentiellement envoyÃ© par mail Ã  la/aux personne(s) concernÃ©e(s).
 
-# Et les paramètres justement ?
+# Et les paramÃ¨tres justement ?
 
 De base, voici votre fichier `Config.xml` :
 
@@ -27,52 +27,50 @@ De base, voici votre fichier `Config.xml` :
 </config>
 ```
 
-C'est peu mais nécessaire et suffisant pour être utilisé avec les paramètres de ligne de commande.
+C'est peu mais nÃ©cessaire et suffisant pour Ãªtre utilisÃ© avec les paramÃ¨tres de ligne de commande.
 
-Chaque nouveau paramètre sera inscrit ainsi :
+Chaque nouveau paramÃ¨tre sera inscrit ainsi :
 ```
     <paramNom>Valeur</paramNom>
 ```
 
-Voici la liste des paramètres gérés :
+Voici la liste des paramÃ¨tres gÃ©rÃ©s :
 
-```
-_dbserver_ : Serveur de base de données avec instance. **Obligatoire**
-_dblogin_ : Login à la base de données. **Obligatoire si _dbtrusted_ est False / 0**
-_dbpw_ : Mot de passe (malheureusement en clair) de la base de données. **Obligatoire si _dbtrusted_ est False / 0**
+_dbserver_ : Serveur de base de donnÃ©es avec instance. **Obligatoire**
+_dblogin_ : Login Ã  la base de donnÃ©es. **Obligatoire si _dbtrusted_ est False / 0**
+_dbpw_ : Mot de passe (malheureusement en clair) de la base de donnÃ©es. **Obligatoire si _dbtrusted_ est False / 0**
 _dbtrusted_ : Connexion en utilisant le login Windows (Trusted Auth) **Obligatoire** (Valeurs possibles : True / 1 / False / 0)
-_dbdb_ : Base de données par défaut suite à la connexion. Rappelez vous qu'un USE peut la changer en cours de route !
+_dbdb_ : Base de donnÃ©es par dÃ©faut suite Ã  la connexion. Rappelez vous qu'un USE peut la changer en cours de route !
 
-_dateTimeFormat_ : Format des dates, car les dates sont retournées au format texte.
+_dateTimeFormat_ : Format des dates, car les dates sont retournÃ©es au format texte.
 
 _mailsend_ : Doit-on envoyer le mail ?
 _mailsmtp_ : Serveur SMTP d'envoi. **Obligatoire si mailsend est True / 1**
 _mailsubject_ : Sujet du mail. **Obligatoire si mailsend est True / 1**
-_mailbody_ : Contenu du mail. Il n'est pas paramétrable. **Obligatoire si mailsend est True / 1**
+_mailbody_ : Contenu du mail. Il n'est pas paramÃ©trable. **Obligatoire si mailsend est True / 1**
 _mailsender_ : Adresse envoyant le mail. **Obligatoire si mailsend est True / 1**
-_mailrecipient_ : Réceptionnaires du mail. Ils sont au format "Nom complet <adresse@example.com>" séparés par des ; et sans les " **Obligatoire si mailsend est True / 1**
-_mailsmtpport_ : Port d'accès au serveur. **25 par défaut**
+_mailrecipient_ : RÃ©ceptionnaires du mail. Ils sont au format "Nom complet <adresse@example.com>" sÃ©parÃ©s par des ; et sans les " **Obligatoire si mailsend est True / 1**
+_mailsmtpport_ : Port d'accÃ¨s au serveur. **25 par dÃ©faut**
 _mailmustlogin_ : Doit-on se connecter au serveur de mail via un login/Mot de passe ?
 _maillogin_ : Login de connexion au SMTP. **Obligatoire si mailmustlogin est True / 1**
 _mailpw_ : Mot de passe de connexion au SMTP. **Obligatoire si mailmustlogin est True / 1**
 
-_excelsheet_ : Doit-on extraire chaque résultat sur un nouvel onglet ? **Obligatoire**
-_excelsqlfile_ : Fichier SQL à exécuter. **Obligatoire**
-_excelfileprefix_ : Préfixe du nom du fichier Excel à extraire. Le fichier final sera de la forme _préfixe_yyyy_mm_dd.xml. Astuce : Le préfixe peut désigner un chemin relatif ou complet. **Obligatoire**
-_excellogprefix_ : Préfixe du log d'erreur. Même règle qu'au dessus.
-_excelsheetprefix_ : Préfixe du nom des onglets. Si excelsheet est False / 0, c'est le nom de l'onglet tel qu'il apparaitra. Sinon, les onglets seront nommés "Onglet 1", "Onglet 2"....
-```
+_excelsheet_ : Doit-on extraire chaque rÃ©sultat sur un nouvel onglet ? **Obligatoire**
+_excelsqlfile_ : Fichier SQL Ã  exÃ©cuter. **Obligatoire**
+_excelfileprefix_ : PrÃ©fixe du nom du fichier Excel Ã  extraire. Le fichier final sera de la forme _prÃ©fixe_yyyy_mm_dd.xml. Astuce : Le prÃ©fixe peut dÃ©signer un chemin relatif ou complet. **Obligatoire**
+_excellogprefix_ : PrÃ©fixe du log d'erreur. MÃªme rÃ¨gle qu'au dessus.
+_excelsheetprefix_ : PrÃ©fixe du nom des onglets. Si excelsheet est False / 0, c'est le nom de l'onglet tel qu'il apparaitra. Sinon, les onglets seront nommÃ©s "Onglet 1", "Onglet 2"....
 
-Rappellez vous qu'un paramètre sur la ligne de commande prévaut sur un paramètre du fichier `Config.xml`, que seul le premier paramètre du fichier Config.xml est pris en compte, alors que seul le dernier paramètre sur la ligne de commande est pris en compte.
+Rappellez vous qu'un paramÃ¨tre sur la ligne de commande prÃ©vaut sur un paramÃ¨tre du fichier `Config.xml`, que seul le premier paramÃ¨tre du fichier Config.xml est pris en compte, alors que seul le dernier paramÃ¨tre sur la ligne de commande est pris en compte.
 
-Dernier détail, il y a un type de paramètres dynamique qui permet d'injecter des valeurs à des variables SQL Server. Ceux ci sont utilisables uniquement via la ligne de commande (si vous me trouvez l'intérêt de pouvoir les paramétrer via le fichier `Config.xml`, je ferais peut-être un effort...)
+Dernier dÃ©tail, il y a un type de paramÃ¨tres dynamique qui permet d'injecter des valeurs Ã  des variables SQL Server. Ceux ci sont utilisables uniquement via la ligne de commande (si vous me trouvez l'intÃ©rÃªt de pouvoir les paramÃ©trer via le fichier `Config.xml`, je ferais peut-Ãªtre un effort...)
 
 ```
 --param-type-_nom_=type
 --param-value_nom_=valeur
 ```
 
-_nom_ correspond au @variable dans votre fichier SQL (ne le préfixez pas par un @) et sera passé en tant que paramètre à la commande SQL. Ne le déclarez pas dans votre fichier SQL, le SqlCommand prenant en charge l'exécution de la requête s'en chargera pour vous.
+_nom_ correspond au @variable dans votre fichier SQL (ne le prÃ©fixez pas par un @) et sera passÃ© en tant que paramÃ¨tre Ã  la commande SQL. Ne le dÃ©clarez pas dans votre fichier SQL, le SqlCommand prenant en charge l'exÃ©cution de la requÃªte s'en chargera pour vous.
 
 type fait partie des types SQL Server, et sont convertis ainsi dans le programme :
 
@@ -91,4 +89,4 @@ uniqueidentifier => Guid
 Tout le reste => object
 ```
 
-Les types à taille fixe se transforment en type variable, donc n'hésitez pas à rajouter des contrôles/conversions dans vos scripts. N'ayant pas de type date seule, ni temps seul en C#, tout est transformé en DateTime. Idem, pour le type image, qui n'est globalement qu'un type varbinary dans SQL.
+Les types Ã  taille fixe se transforment en type variable, donc n'hÃ©sitez pas Ã  rajouter des contrÃ´les/conversions dans vos scripts. N'ayant pas de type date seule, ni temps seul en C#, tout est transformÃ© en DateTime. Idem, pour le type image, qui n'est globalement qu'un type varbinary dans SQL.
