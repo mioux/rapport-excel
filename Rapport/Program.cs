@@ -125,6 +125,9 @@ namespace Rapport
             if (tmpString != string.Empty)
                 FormatSettings.DateTime = tmpString;
 
+            // Extraction des paramètres
+            ParamsExtract();
+            
             // Extraction des données
             DataSet data = MsSqlServer.Extract();
 
@@ -143,11 +146,152 @@ namespace Rapport
                 if (redirect != null)
                     redirect.Dispose();
             }
-#if DEBUG
-            Console.WriteLine("Fin");
-            Console.ReadKey(true);
-#endif
         }
+        
+        /// <summary>
+        /// Extraction des paramètres.
+        /// </summary>
+        /// <param name="args">Transférer les paramètres de la ligne de commande.</param>
+        
+        static void ParamsExtract()
+		{
+        	string[] args = Environment.GetCommandLineArgs();
+        	
+        	/// Séparation de la recherche du type et de la valeur, pour connaître le type en amont.
+        	
+			foreach (string arg in args)
+			{
+				if (arg.StartsWith("--param-type-") && arg.Contains("="))
+				{
+					string paramName = arg.Substring(13).Split('=')[0];
+					string paramType = GetSettingsValue(null, "param-type-" + paramName).ToLower().Trim();
+					Type T;
+					
+					switch (paramType)
+					{
+						case "tinyint":
+							T = typeof(byte);
+							break;
+						case "smallint":
+							T = typeof(short);
+							break;
+						case "bigint":
+							T = typeof(long);
+							break;
+						case "binary":
+						case "varbinary":
+						case "image":
+							T = typeof(byte[]);
+							break;
+						case "bit":
+							T = typeof(bool);
+							break;
+						case "datetime":
+						case "smalldatetime":
+						case "timestamp":
+							T = typeof(DateTime);
+							break;
+						case "decimal":
+						case "money":
+						case "numeric":
+						case "smallmoney":
+							T = typeof(Decimal);
+							break;
+						case "int":
+							T = typeof(int);
+							break;
+						case "float":
+						case "real":
+							T = typeof(double);
+							break;
+						case "varchar":
+						case "char":
+						case "nchar":
+						case "nvarchar":
+						case "text":
+						case "ntext":
+							T = typeof(string);
+							break;
+						case "uniqueidentifier":
+							T = typeof(Guid);
+							break;
+						default:
+							T = typeof(object);
+							break;
+					}
+					
+					if (false == RapportSettings.ParametersType.ContainsKey(paramName))
+					{
+						RapportSettings.ParametersType.Add(paramName, T);
+					}
+					else
+					{
+						RapportSettings.ParametersType[paramName] = T;
+					}
+				}
+			}
+			
+			/// Valeur des paramètres.
+			foreach (string arg in args)
+			{
+				if (arg.StartsWith("--param-value-") && arg.Contains("="))
+				{
+					string paramName = arg.Substring(14).Split('=')[0];
+					string paramValue = GetSettingsValue(null, "param-value-" + paramName).ToLower().Trim();
+					
+					Type curType = typeof(object);
+					
+					if (true == RapportSettings.ParametersType.ContainsKey(paramName))
+					{
+						curType = RapportSettings.ParametersType[paramName];
+					}
+					if(curType == typeof(byte))
+					{
+						RapportSettings.AddParam(paramName, Convert.ToByte(paramValue));
+					}
+					else if(curType == typeof(short))
+					{
+						RapportSettings.AddParam(paramName, Convert.ToInt16(paramValue));
+					}
+					else if(curType == typeof(long))
+					{
+						RapportSettings.AddParam(paramName, Convert.ToInt64(paramValue));
+					}
+					else if(curType == typeof(byte[]))
+					{
+						RapportSettings.AddParam(paramName, Convert.FromBase64String(paramValue));
+					}
+					else if(curType == typeof(bool))
+					{
+						RapportSettings.AddParam(paramName, Convert.ToBoolean(paramValue));
+					}
+					else if(curType == typeof(DateTime))
+					{
+						RapportSettings.AddParam(paramName, Convert.ToDateTime(paramValue));
+					}
+					else if(curType == typeof(Decimal))
+					{
+						RapportSettings.AddParam(paramName, Convert.ToDecimal(paramValue));
+					}
+					else if(curType == typeof(int))
+					{
+						RapportSettings.AddParam(paramName, Convert.ToInt32(paramValue));
+					}
+					else if(curType == typeof(double))
+					{
+						RapportSettings.AddParam(paramName, Convert.ToDouble(paramValue));
+					}
+					else if(curType == typeof(string))
+					{
+						RapportSettings.AddParam(paramName, Convert.ToString(paramValue));
+					}
+					else
+					{
+						RapportSettings.AddParam(paramName, (object)paramValue);
+					}
+				}
+			}
+		}
 
         /// <summary>
         /// Envoi d'un mail avec le fichier spécifié en pièce jointe.
@@ -204,7 +348,7 @@ namespace Rapport
                 }
             }
 
-            if (false == found)
+            if (false == found && null != xml)
             {
                 XmlNodeList nodeBuff = xml.GetElementsByTagName(tag);
                 nodeBuff = xml.GetElementsByTagName(tag);

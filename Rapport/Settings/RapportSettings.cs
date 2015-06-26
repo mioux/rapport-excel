@@ -19,5 +19,24 @@ namespace Rapport.Settings
 
         private static bool _bySheetOutput = false;
         public static bool BySheetOutput { get { return _bySheetOutput; } set { _bySheetOutput = value; } }
+        
+        private static Dictionary<string, object> _parameters = new Dictionary<string, object>();
+        public static Dictionary<string, object> Parameters { get { return _parameters; } private set { _parameters = value; } }
+        
+        private static Dictionary<string, Type> _parametersType = new Dictionary<string, Type>();
+        public static Dictionary<string, Type> ParametersType { get { return _parametersType; } private set { _parametersType = value; } }
+        
+        
+        public static void AddParam(string paramName, object paramValue)
+        {
+        	if (true == _parameters.ContainsKey("paramName"))
+        	{
+        		_parameters[paramName] = paramValue;
+        	}
+        	else
+        	{
+        		_parameters.Add(paramName, paramValue);
+        	}
+        }
     }
 }
