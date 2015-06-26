@@ -36,30 +36,30 @@ Chaque nouveau paramètre sera inscrit ainsi :
 
 Voici la liste des paramètres gérés :
 
-_dbserver_ : Serveur de base de données avec instance. **Obligatoire**
-_dblogin_ : Login à la base de données. **Obligatoire si _dbtrusted_ est False / 0**
-_dbpw_ : Mot de passe (malheureusement en clair) de la base de données. **Obligatoire si _dbtrusted_ est False / 0**
-_dbtrusted_ : Connexion en utilisant le login Windows (Trusted Auth) **Obligatoire** (Valeurs possibles : True / 1 / False / 0)
-_dbdb_ : Base de données par défaut suite à la connexion. Rappelez vous qu'un USE peut la changer en cours de route !
+_dbserver_ : Serveur de base de données avec instance. **Obligatoire**  
+_dblogin_ : Login à la base de données. **Obligatoire si _dbtrusted_ est False / 0**  
+_dbpw_ : Mot de passe (malheureusement en clair) de la base de données. **Obligatoire si _dbtrusted_ est False / 0**  
+_dbtrusted_ : Connexion en utilisant le login Windows (Trusted Auth) **Obligatoire** (Valeurs possibles : True / 1 / False / 0)  
+_dbdb_ : Base de données par défaut suite à la connexion. Rappelez vous qu'un USE peut la changer en cours de route !  
 
-_dateTimeFormat_ : Format des dates, car les dates sont retournées au format texte.
+_dateTimeFormat_ : Format des dates, car les dates sont retournées au format texte.  
 
-_mailsend_ : Doit-on envoyer le mail ?
-_mailsmtp_ : Serveur SMTP d'envoi. **Obligatoire si mailsend est True / 1**
-_mailsubject_ : Sujet du mail. **Obligatoire si mailsend est True / 1**
-_mailbody_ : Contenu du mail. Il n'est pas paramétrable. **Obligatoire si mailsend est True / 1**
-_mailsender_ : Adresse envoyant le mail. **Obligatoire si mailsend est True / 1**
-_mailrecipient_ : Réceptionnaires du mail. Ils sont au format "Nom complet <adresse@example.com>" séparés par des ; et sans les " **Obligatoire si mailsend est True / 1**
-_mailsmtpport_ : Port d'accès au serveur. **25 par défaut**
-_mailmustlogin_ : Doit-on se connecter au serveur de mail via un login/Mot de passe ?
-_maillogin_ : Login de connexion au SMTP. **Obligatoire si mailmustlogin est True / 1**
-_mailpw_ : Mot de passe de connexion au SMTP. **Obligatoire si mailmustlogin est True / 1**
+_mailsend_ : Doit-on envoyer le mail ?  
+_mailsmtp_ : Serveur SMTP d'envoi. **Obligatoire si mailsend est True / 1**  
+_mailsubject_ : Sujet du mail. **Obligatoire si mailsend est True / 1**  
+_mailbody_ : Contenu du mail. Il n'est pas paramétrable. **Obligatoire si mailsend est True / 1**  
+_mailsender_ : Adresse envoyant le mail. **Obligatoire si mailsend est True / 1**  
+_mailrecipient_ : Réceptionnaires du mail. Ils sont au format "Nom complet <adresse@example.com>" séparés par des ; et sans les " **Obligatoire si mailsend est True / 1**  
+_mailsmtpport_ : Port d'accès au serveur. **25 par défaut**  
+_mailmustlogin_ : Doit-on se connecter au serveur de mail via un login/Mot de passe ?  
+_maillogin_ : Login de connexion au SMTP. **Obligatoire si mailmustlogin est True / 1**  
+_mailpw_ : Mot de passe de connexion au SMTP. **Obligatoire si mailmustlogin est True / 1**  
 
-_excelsheet_ : Doit-on extraire chaque résultat sur un nouvel onglet ? **Obligatoire**
-_excelsqlfile_ : Fichier SQL à exécuter. **Obligatoire**
-_excelfileprefix_ : Préfixe du nom du fichier Excel à extraire. Le fichier final sera de la forme _préfixe_yyyy_mm_dd.xml. Astuce : Le préfixe peut désigner un chemin relatif ou complet. **Obligatoire**
-_excellogprefix_ : Préfixe du log d'erreur. Même règle qu'au dessus.
-_excelsheetprefix_ : Préfixe du nom des onglets. Si excelsheet est False / 0, c'est le nom de l'onglet tel qu'il apparaitra. Sinon, les onglets seront nommés "Onglet 1", "Onglet 2"....
+_excelsheet_ : Doit-on extraire chaque résultat sur un nouvel onglet ? **Obligatoire**  
+_excelsqlfile_ : Fichier SQL à exécuter. **Obligatoire**  
+_excelfileprefix_ : Préfixe du nom du fichier Excel à extraire. Le fichier final sera de la forme _préfixe_yyyy_mm_dd.xml. Astuce : Le préfixe peut désigner un chemin relatif ou complet. **Obligatoire**  
+_excellogprefix_ : Préfixe du log d'erreur. Même règle qu'au dessus.  
+_excelsheetprefix_ : Préfixe du nom des onglets. Si excelsheet est False / 0, c'est le nom de l'onglet tel qu'il apparaitra. Sinon, les onglets seront nommés "Onglet 1", "Onglet 2"....  
 
 Rappellez vous qu'un paramètre sur la ligne de commande prévaut sur un paramètre du fichier `Config.xml`, que seul le premier paramètre du fichier Config.xml est pris en compte, alors que seul le dernier paramètre sur la ligne de commande est pris en compte.
 
