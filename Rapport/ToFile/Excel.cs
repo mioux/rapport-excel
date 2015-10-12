@@ -3,8 +3,8 @@ using Rapport.Settings;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text;
+using System.Globalization;
 
 namespace Rapport.ToFile
 {
@@ -12,6 +12,13 @@ namespace Rapport.ToFile
     {
         public static string Generate(DataSet data)
         {
+        	CultureInfo oldCurrentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+        	CultureInfo oldCurrentUICulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
+        	
+            // L'appli est passée en culture en-US pour la gestion correcte des ToString dans le fichier Excel
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
+        	
             Workbook rapport = new Workbook();
             Worksheet rapportSheet = null;
 
@@ -86,6 +93,10 @@ namespace Rapport.ToFile
 
             rapport.Save(ExcelFileName);
 
+            // L'appli est passée en culture en-US pour la gestion correcte des ToString dans le fichier Excel
+            System.Threading.Thread.CurrentThread.CurrentCulture = oldCurrentCulture;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = oldCurrentUICulture;
+            
             return ExcelFileName;
         }
     }

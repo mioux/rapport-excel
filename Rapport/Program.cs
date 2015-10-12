@@ -17,8 +17,7 @@ namespace Rapport
         // Fichier de config
         private static string configFile = "Config.xml";
 
-        public static OutToFile Redirect { get { return redirect; } }
-        private static OutToFile redirect = null;
+        public static OutToFile Redirect { get; private set; }
 
         /// <summary>
         /// Fonction principale.
@@ -30,10 +29,6 @@ namespace Rapport
             bool tmpBool;
             int tmpInt;
             string tmpString;
-
-            // L'appli est passée en culture en-US pour la gestion correcte des ToString dans le fichier Excel
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
 
             StringBuilder errors = new StringBuilder();
 
@@ -53,7 +48,7 @@ namespace Rapport
             if (string.Empty != RapportSettings.LogFilePrefix.Trim())
             {
                 RapportSettings.LogFile = string.Format("{0}{1:yyyy_MM_dd}.log", RapportSettings.LogFilePrefix, DateTime.Now);
-                redirect = new OutToFile(RapportSettings.LogFile);
+                Redirect = new OutToFile(RapportSettings.LogFile);
             }
 
             if (false == File.Exists(RapportSettings.File))
@@ -143,8 +138,19 @@ namespace Rapport
             }
             finally
             {
-                if (redirect != null)
-                    redirect.Dispose();
+                if (Redirect != null)
+                    Redirect.Dispose();
+            }
+            
+            // Suppression du fichier de logs si le fichier est vide.
+            if (File.Exists(RapportSettings.LogFile))
+            {
+         	   FileInfo fi = new FileInfo(RapportSettings.LogFile);
+            
+         	   if (fi.Length == 0)
+         	   {
+         	       File.Delete(RapportSettings.LogFile);
+         	   }
             }
         }
         
@@ -376,21 +382,21 @@ namespace Rapport
 
         public static void ErrorClose(string msg)
         {
-            Console.Error.WriteLine(msg);
+            Console.Error.WriteLine("[{0}] {1}", DateTime.Now, msg);
 #if DEBUG
             Console.WriteLine("Erreur");
             Console.ReadKey(true);
 #endif
-            if (File.Exists(RapportSettings.LogFile) && redirect != null)
+            if (File.Exists(RapportSettings.LogFile) && Redirect != null)
             {
                 try
                 {
-                    redirect.Dispose();
+                    Redirect.Dispose();
                     sendMail(RapportSettings.LogFile);
                 }
                 catch (Exception exp)
                 {
-                    Console.Error.WriteLine("Erreur lors de l'envoi du log d'erreur : {0}", exp.Message);
+                    Console.Error.WriteLine("[{0}] Erreur lors de l'envoi du log d'erreur : {1}", DateTime.Now, exp.Message);
                 }
             }
 
