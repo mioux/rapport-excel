@@ -49,7 +49,7 @@ _mailsmtp_ : Serveur SMTP d'envoi. **Obligatoire si mailsend est True / 1**
 _mailsubject_ : Sujet du mail. **Obligatoire si mailsend est True / 1**  
 _mailbody_ : Contenu du mail. Il n'est pas paramétrable. **Obligatoire si mailsend est True / 1**  
 _mailsender_ : Adresse envoyant le mail. **Obligatoire si mailsend est True / 1**  
-_mailrecipient_ : Réceptionnaires du mail. Ils sont au format "Nom complet <adresse@example.com>" séparés par des ; et sans les " **Obligatoire si mailsend est True / 1**  
+_mailrecipient_ : Réceptionnaires du mail. Ils sont au format ```Nom complet <adresse@example.com>``` séparés par des ; et sans les " **Obligatoire si mailsend est True / 1**  
 _mailsmtpport_ : Port d'accès au serveur. **25 par défaut**  
 _mailmustlogin_ : Doit-on se connecter au serveur de mail via un login/Mot de passe ?  
 _maillogin_ : Login de connexion au SMTP. **Obligatoire si mailmustlogin est True / 1**  
@@ -66,11 +66,11 @@ Rappellez vous qu'un paramètre sur la ligne de commande prévaut sur un paramè
 Dernier détail, il y a un type de paramètres dynamique qui permet d'injecter des valeurs à des variables SQL Server. Ceux ci sont utilisables uniquement via la ligne de commande (si vous me trouvez l'intérêt de pouvoir les paramétrer via le fichier `Config.xml`, je ferais peut-être un effort...)
 
 ```
---param-type-_nom_=type
---param-value_nom_=valeur
+--param-type-nom_parametre=type
+--param-value-nom_parametre=valeur
 ```
 
-_nom_ correspond au @variable dans votre fichier SQL (ne le préfixez pas par un @) et sera passé en tant que paramètre à la commande SQL. Ne le déclarez pas dans votre fichier SQL, le SqlCommand prenant en charge l'exécution de la requête s'en chargera pour vous.
+_nom_parametre_ correspond au @variable dans votre fichier SQL (ne le préfixez pas par un @) et sera passé en tant que paramètre à la commande SQL. Ne le déclarez pas dans votre fichier SQL, le SqlCommand prenant en charge l'exécution de la requête s'en chargera pour vous.
 
 type fait partie des types SQL Server, et sont convertis ainsi dans le programme :
 
