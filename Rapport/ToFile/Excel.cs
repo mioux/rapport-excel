@@ -1,103 +1,101 @@
 ﻿using CarlosAg.ExcelXmlWriter;
 using Rapport.Settings;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using System.Globalization;
 
 namespace Rapport.ToFile
 {
-    class Excel
-    {
-        public static string Generate(DataSet data)
-        {
-        	CultureInfo oldCurrentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-        	CultureInfo oldCurrentUICulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
-        	
-            // L'appli est passée en culture en-US pour la gestion correcte des ToString dans le fichier Excel
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
-        	
-            Workbook rapport = new Workbook();
-            Worksheet rapportSheet = null;
+	class Excel
+	{
+		public static string Generate(DataSet data)
+		{
+			CultureInfo oldCurrentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+			CultureInfo oldCurrentUICulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
 
-            int tbCount = 0;
+			// L'appli est passée en culture en-US pour la gestion correcte des ToString dans le fichier Excel
+			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+			System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
 
-            WorksheetStyle headerStyle = rapport.Styles.Add("HeaderStyle");
-            headerStyle.Font.Bold = true;
-            headerStyle.Alignment.Horizontal = StyleHorizontalAlignment.Center;
-            headerStyle.Interior.Color = "#DEDEDE";
-            headerStyle.Interior.Pattern = StyleInteriorPattern.Solid;
+			Workbook rapport = new Workbook();
+			Worksheet rapportSheet = null;
 
-            WorksheetStyle dateStyle = rapport.Styles.Add("dateStyle");
-            dateStyle.NumberFormat = FormatSettings.DateTime;
+			int tbCount = 0;
 
-            string ExcelFileName = string.Format("{1}{0:yyyy_MM_dd}.xml", DateTime.Now, RapportSettings.OutFilePrefix);
+			WorksheetStyle headerStyle = rapport.Styles.Add("HeaderStyle");
+			headerStyle.Font.Bold = true;
+			headerStyle.Alignment.Horizontal = StyleHorizontalAlignment.Center;
+			headerStyle.Interior.Color = "#DEDEDE";
+			headerStyle.Interior.Pattern = StyleInteriorPattern.Solid;
 
-            foreach (DataTable curTable in data.Tables)
-            {
-                if (null == rapportSheet && false == RapportSettings.BySheetOutput)
-                    rapportSheet = rapport.Worksheets.Add(string.Format("{1}{0:dd-MM-yyyy}", DateTime.Now, RapportSettings.SheetNamePrefix));
-                else if (true == RapportSettings.BySheetOutput)
-                    rapportSheet = rapport.Worksheets.Add(string.Format("{1}{0}", ++tbCount, RapportSettings.SheetNamePrefix));
+			WorksheetStyle dateStyle = rapport.Styles.Add("dateStyle");
+			dateStyle.NumberFormat = FormatSettings.DateTime;
 
-                WorksheetRow headerRow = rapportSheet.Table.Rows.Add();
+			string ExcelFileName = string.Format("{1}{0:yyyy_MM_dd}.xml", DateTime.Now, RapportSettings.OutFilePrefix);
 
-                foreach (DataColumn curColumn in curTable.Columns)
-                {
-                    WorksheetCell curCell = headerRow.Cells.Add(curColumn.ColumnName);
-                    curCell.StyleID = "HeaderStyle";
-                }
+			foreach (DataTable curTable in data.Tables)
+			{
+				if (null == rapportSheet && false == RapportSettings.BySheetOutput)
+					rapportSheet = rapport.Worksheets.Add(string.Format("{1}{0:dd-MM-yyyy}", DateTime.Now, RapportSettings.SheetNamePrefix));
+				else if (true == RapportSettings.BySheetOutput)
+					rapportSheet = rapport.Worksheets.Add(string.Format("{1}{0}", ++tbCount, RapportSettings.SheetNamePrefix));
 
-                foreach (DataRow curRow in curTable.Rows)
-                {
-                    WorksheetRow row = rapportSheet.Table.Rows.Add();
-                    foreach (DataColumn curColumn in curTable.Columns)
-                    {
-                        object curRawData = curRow[curColumn];
+				WorksheetRow headerRow = rapportSheet.Table.Rows.Add();
 
-                        string curData = string.Empty;
-                        if (curRawData != null && curRawData != DBNull.Value)
-                            curData = curRawData.ToString();
+				foreach (DataColumn curColumn in curTable.Columns)
+				{
+					WorksheetCell curCell = headerRow.Cells.Add(curColumn.ColumnName);
+					curCell.StyleID = "HeaderStyle";
+				}
 
-                        if (curRawData is bool)
-                            curData = Convert.ToBoolean(curRawData) ? "1" : "0";
-                        else if (curRawData is DateTime)
-                            curData = Convert.ToDateTime(curRawData).ToString("s");
+				foreach (DataRow curRow in curTable.Rows)
+				{
+					WorksheetRow row = rapportSheet.Table.Rows.Add();
+					foreach (DataColumn curColumn in curTable.Columns)
+					{
+						object curRawData = curRow[curColumn];
 
-                        WorksheetCell curCell = row.Cells.Add(curData);
-                        if (curRawData is int ||
-                            curRawData is short ||
-                            curRawData is byte ||
-                            curRawData is long ||
-                            curRawData is float ||
-                            curRawData is double ||
-                            curRawData is decimal)
-                            curCell.Data.Type = DataType.Number;
-                        else if (curRawData is bool)
-                            curCell.Data.Type = DataType.Boolean;
-                        else if (curRawData is DateTime)
-                        {
-                            curCell.Data.Type = DataType.DateTime;
-                            curCell.StyleID = "dateStyle";
-                        }
-                    }
-                }
+						string curData = string.Empty;
+						if (curRawData != null && curRawData != DBNull.Value)
+							curData = curRawData.ToString();
 
-                if (false == RapportSettings.BySheetOutput)
-                    rapportSheet.Table.Rows.Add();
-                else
-                    rapportSheet.AutoFilter.Range = "R1C1:R1C" + curTable.Columns.Count;
-            }
+						if (curRawData is bool)
+							curData = Convert.ToBoolean(curRawData) ? "1" : "0";
+						else if (curRawData is DateTime)
+							curData = Convert.ToDateTime(curRawData).ToString("s");
 
-            rapport.Save(ExcelFileName);
+						WorksheetCell curCell = row.Cells.Add(curData);
+						if (curRawData is int ||
+							curRawData is short ||
+							curRawData is byte ||
+							curRawData is long ||
+							curRawData is float ||
+							curRawData is double ||
+							curRawData is decimal)
+							curCell.Data.Type = DataType.Number;
+						else if (curRawData is bool)
+							curCell.Data.Type = DataType.Boolean;
+						else if (curRawData is DateTime)
+						{
+							curCell.Data.Type = DataType.DateTime;
+							curCell.StyleID = "dateStyle";
+						}
+					}
+				}
 
-            // L'appli est passée en culture en-US pour la gestion correcte des ToString dans le fichier Excel
-            System.Threading.Thread.CurrentThread.CurrentCulture = oldCurrentCulture;
-            System.Threading.Thread.CurrentThread.CurrentUICulture = oldCurrentUICulture;
-            
-            return ExcelFileName;
-        }
-    }
+				if (false == RapportSettings.BySheetOutput)
+					rapportSheet.Table.Rows.Add();
+				else
+					rapportSheet.AutoFilter.Range = "R1C1:R1C" + curTable.Columns.Count;
+			}
+
+			rapport.Save(ExcelFileName);
+
+			// L'appli est passée en culture en-US pour la gestion correcte des ToString dans le fichier Excel
+			System.Threading.Thread.CurrentThread.CurrentCulture = oldCurrentCulture;
+			System.Threading.Thread.CurrentThread.CurrentUICulture = oldCurrentUICulture;
+
+			return ExcelFileName;
+		}
+	}
 }

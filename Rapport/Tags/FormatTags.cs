@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Rapport.Tags
+﻿namespace Rapport.Tags
 {
-    class FormatTags
-    {
-        public static string DateTimeFormat { get { return "dateTimeFormat"; } }
-    }
+	class FormatTags
+	{
+		public static string DateTimeFormat { get { return "dateTimeFormat"; } }
+	}
 }

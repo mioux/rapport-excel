@@ -19,16 +19,16 @@ namespace Rapport
 
     public class OutToFile : IDisposable
     {
-        private StreamWriter fileOutput;
-        private TextWriter oldOutput;
-        private TextWriter oldError;
-        /// <summary>
-        /// Create a new object to redirect the output
-        /// </summary>
-        /// <param name="outFileName">
-        /// The name of the file to capture console output
+		StreamWriter fileOutput;
+		private TextWriter oldOutput;
+		TextWriter oldError;
+		/// <summary>
+		/// Create a new object to redirect the output
+		/// </summary>
+		/// <param name="outFileName">
+		/// The name of the file to capture console output
 
-        public OutToFile(string outFileName)
+		public OutToFile(string outFileName)
         {
             oldOutput = Console.Out;
             oldError = Console.Error;

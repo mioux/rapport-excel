@@ -14,10 +14,10 @@ namespace Rapport
 {
     class Program
     {
-        // Fichier de config
-        private static string configFile = "Config.xml";
+		// Fichier de config
+		static string configFile = "Config.xml";
 
-        public static OutToFile Redirect { get; private set; }
+		public static OutToFile Redirect { get; private set; }
 
         /// <summary>
         /// Fonction principale.
@@ -299,45 +299,45 @@ namespace Rapport
 			}
 		}
 
-        /// <summary>
-        /// Envoi d'un mail avec le fichier spécifié en pièce jointe.
-        /// </summary>
-        /// <param name="fileName">Pièce à joindre</param>
+		/// <summary>
+		/// Envoi d'un mail avec le fichier spécifié en pièce jointe.
+		/// </summary>
+		/// <param name="fileName">Pièce à joindre</param>
 
-        private static void sendMail(string fileName)
-        {
-            FileInfo fi = new FileInfo(fileName);
+		static void sendMail(string fileName)
+		{
+			FileInfo fi = new FileInfo(fileName);
 
-            // Envoi du mail
-            if (true == MailSettings.Send && fi.Length > 0)
-            {
-                MailMessage mailMessage = new MailMessage();
-                mailMessage.From = new MailAddress(MailSettings.Sender);
-                mailMessage.To.Add(MailSettings.Recipient);
-                mailMessage.Subject = MailSettings.Subject;
-                mailMessage.Body = MailSettings.Body;
-                mailMessage.IsBodyHtml = false;
-                mailMessage.Attachments.Add(new Attachment(fileName));
+			// Envoi du mail
+			if (true == MailSettings.Send && fi.Length > 0)
+			{
+				MailMessage mailMessage = new MailMessage();
+				mailMessage.From = new MailAddress(MailSettings.Sender);
+				mailMessage.To.Add(MailSettings.Recipient);
+				mailMessage.Subject = MailSettings.Subject;
+				mailMessage.Body = MailSettings.Body;
+				mailMessage.IsBodyHtml = false;
+				mailMessage.Attachments.Add(new Attachment(fileName));
 
-                SmtpClient smtp = new SmtpClient(MailSettings.Server, MailSettings.Port);
-                if (true == MailSettings.MustLogin)
-                {
-                    NetworkCredential smtpAuth = new NetworkCredential(MailSettings.Login, MailSettings.Pw);
-                    smtp.UseDefaultCredentials = false;
-                    smtp.Credentials = smtpAuth;
-                }
-                smtp.Send(mailMessage);
-            }
-        }
+				SmtpClient smtp = new SmtpClient(MailSettings.Server, MailSettings.Port);
+				if (true == MailSettings.MustLogin)
+				{
+					NetworkCredential smtpAuth = new NetworkCredential(MailSettings.Login, MailSettings.Pw);
+					smtp.UseDefaultCredentials = false;
+					smtp.Credentials = smtpAuth;
+				}
+				smtp.Send(mailMessage);
+			}
+		}
 
-        /// <summary>
-        /// Récupère la valeur d'un tag XML
-        /// </summary>
-        /// <param name="xml">Document XML contenant la donnée</param>
-        /// <param name="serverTag">Tag à retourner</param>
-        /// <returns>InnerText du premier tag rencontré ou vide sinon</returns>
+		/// <summary>
+		/// Récupère la valeur d'un tag XML
+		/// </summary>
+		/// <param name="xml">Document XML contenant la donnée</param>
+		/// <param name="serverTag">Tag à retourner</param>
+		/// <returns>InnerText du premier tag rencontré ou vide sinon</returns>
 
-        private static string GetSettingsValue(XmlDocument xml, string tag)
+		private static string GetSettingsValue(XmlDocument xml, string tag)
         {
             string data = string.Empty;
 
@@ -365,22 +365,22 @@ namespace Rapport
             return data;
         }
 
-        /// <summary>
-        /// Un argument n'est pas valide.
-        /// </summary>
-        /// <param name="arg">valeur de l'argument</param>
+		/// <summary>
+		/// Un argument n'est pas valide.
+		/// </summary>
+		/// <param name="arg">valeur de l'argument</param>
 
-        private static void argError(string arg)
-        {
-            ErrorClose(string.Format("L'argument doit être numérique : {0}", arg));
-        }
+		static void argError(string arg)
+		{
+			ErrorClose(string.Format("L'argument doit être numérique : {0}", arg));
+		}
 
-        /// <summary>
-        /// Affiche un message d'erreur et quitte l'application.
-        /// </summary>
-        /// <param name="msg"></param>
+		/// <summary>
+		/// Affiche un message d'erreur et quitte l'application.
+		/// </summary>
+		/// <param name="msg"></param>
 
-        public static void ErrorClose(string msg)
+		public static void ErrorClose(string msg)
         {
             Console.Error.WriteLine("[{0}] {1}", DateTime.Now, msg);
 #if DEBUG

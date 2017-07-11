@@ -92,6 +92,7 @@
     <Compile Include="Tags\FormatTags.cs" />
     <Compile Include="Tags\MailTags.cs" />
     <Compile Include="Tags\RapportTags.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config.xml">
@@ -104,12 +105,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="CarlosAg.ExcelXmlWriter">
-      <HintPath>bin\Debug\CarlosAg.ExcelXmlWriter.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="CarlosAg.ExcelXmlWriter">
+      <HintPath>CarlosAg.ExcelXmlWriter.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
